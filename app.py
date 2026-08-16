@@ -69,6 +69,8 @@ with tab_admin:
       idx = (df["Nama Kandidat"] + " - " + df["Timestamp"]).tolist().index(pilihan)
       st.info(df.iloc[idx]["Detail Evaluasi"])
     else: st.info("Belum ada data.")
+  elif password != "":
+    st.warning("⚠️ Password salah!")
 
 with tab_kandidat:
   st.title("🤖 AI Interview Assistant")
@@ -94,17 +96,24 @@ with tab_kandidat:
         st.session_state.generated_questions = [q.strip() for q in resp.choices[0].message.content.split("\n") if q.strip()]
         st.session_state.cv_uploaded = True
         st.rerun()
+      else:
+        st.warning("⚠️ Mohon lengkapi nama dan unggah file CV.")
   else:
     q_list = st.session_state.generated_questions
     if st.session_state.step < len(q_list):
       st.subheader(f"Pertanyaan {st.session_state.step + 1} dari {len(q_list)}")
       st.markdown(f"> **{q_list[st.session_state.step]}**")
-      with st.form("jawab"):
-        ans = st.text_area("Jawaban:")
+      
+      # Menggunakan key dinamis agar kotak teks bersih otomatis setiap ganti pertanyaan
+      with st.form(key=f"form_ans_{st.session_state.step}"):
+        ans = st.text_area("Jawaban:", key=f"input_ans_{st.session_state.step}")
         if st.form_submit_button("Kirim & Lanjut"):
-          st.session_state.answers.append({"q": q_list[st.session_state.step], "a": ans})
-          st.session_state.step += 1
-          st.rerun()
+          if not ans.strip():
+            st.warning("Mohon masukkan jawaban terlebih dahulu.")
+          else:
+            st.session_state.answers.append({"q": q_list[st.session_state.step], "a": ans})
+            st.session_state.step += 1
+            st.rerun()
     else:
       if not st.session_state.get("saved", False):
         with st.spinner("Menyimpan..."):
@@ -113,6 +122,7 @@ with tab_kandidat:
           simpan_ke_googlesheet(st.session_state.nama_kandidat, role, "Selesai", "Review", resp.choices[0].message.content)
           st.session_state.saved = True
       st.success("Wawancara Selesai!")
+      st.markdown("Terima kasih telah menyelesaikan sesi wawancara. Data Anda telah direkam.")
       if st.button("Sesi Baru"):
         st.session_state.clear()
         st.rerun()
