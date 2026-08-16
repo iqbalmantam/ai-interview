@@ -17,11 +17,17 @@ st.sidebar.header("⚙️ Konfigurasi Rekrutmen")
 role = st.sidebar.selectbox(
     "Pilih Posisi yang Dilamar",
     [
+        "Administrative Staff (Admin)",
+        "Operations Supervisor",
         "Software Engineer (Full Stack)",
         "Product Manager",
         "Customer Success Specialist",
         "Data Analyst",
+        "Finance & Accounting Staff",
+        "HR & Recruitment Officer",
+        "Marketing Specialist",
     ],
+)
 )
 
 st.sidebar.markdown("---")
