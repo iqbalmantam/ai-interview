@@ -28,7 +28,6 @@ role = st.sidebar.selectbox(
         "Marketing Specialist",
     ],
 )
-)
 
 st.sidebar.markdown("---")
 st.sidebar.info(
