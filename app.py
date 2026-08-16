@@ -96,7 +96,38 @@ with tab_admin:
       df_hasil = ambil_data_googlesheet()
 
     if not df_hasil.empty:
+      # Tampilkan tabel rekap
       st.dataframe(df_hasil, use_container_width=True)
+
+      st.markdown("---")
+      st.subheader("📋 Lihat Detail Evaluasi Kandidat")
+
+      # Dropdown untuk memilih kandidat berdasarkan nama dan waktu
+      list_kandidat = (
+          df_hasil["Nama Kandidat"]
+          + " ("
+          + df_hasil["Timestamp"]
+          + " - "
+          + df_hasil["Posisi / Role"]
+          + ")"
+      ).tolist()
+
+      pilihan_kandidat = st.selectbox(
+          "Pilih Kandidat untuk Melihat Detail Evaluasi", list_kandidat
+      )
+
+      if pilihan_kandidat:
+        idx = list_kandidat.index(pilihan_kandidat)
+        row_data = df_hasil.iloc[idx]
+
+        st.markdown(
+            f"### Detail Evaluasi: **{row_data['Nama Kandidat']}**"
+        )
+        st.markdown(f"**Posisi:** {row_data['Posisi / Role']}")
+        st.markdown(f"**Waktu Wawancara:** {row_data['Timestamp']}")
+
+        # Tampilkan teks evaluasi lengkap tanpa terpotong
+        st.info(row_data["Detail Evaluasi"])
     else:
       st.info("Belum ada data atau Google Sheets masih kosong.")
   elif password_input != "":
@@ -180,7 +211,7 @@ with tab_kandidat:
             st.error(f"Gagal memproses CV: {e}")
 
   else:
-    # Tahap 2: Sesi Tanya Jawab (Tanpa Suara AI)
+    # Tahap 2: Sesi Tanya Jawab
     current_questions = st.session_state.generated_questions
 
     if st.session_state.step < len(current_questions):
